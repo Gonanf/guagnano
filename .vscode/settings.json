@@ -61,6 +61,12 @@
         "__split_buffer": "cpp",
         "__verbose_abort": "cpp",
         "ios": "cpp",
-        "locale": "cpp"
+        "locale": "cpp",
+        "chrono": "cpp",
+        "random": "cpp",
+        "semaphore": "cpp",
+        "valarray": "cpp",
+        "ratio": "cpp",
+        "*.inc": "cpp"
     }
 }
