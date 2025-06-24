@@ -192,6 +192,7 @@ CMakeFiles/tarea.dir/src/main.cpp.o
  /usr/include/locale.h
  /usr/include/pthread.h
  /usr/include/sched.h
+ /usr/include/sqlite3.h
  /usr/include/stdc-predef.h
  /usr/include/stdio.h
  /usr/include/stdlib.h

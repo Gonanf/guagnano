@@ -8,6 +8,7 @@ set(CMAKE_DEPENDS_LANGUAGES
 
 # The set of dependency files which are needed:
 set(CMAKE_DEPENDS_DEPENDENCY_FILES
+  "/run/media/chaos/terciario/proyectos/guagnano/lib/sqlite3.c" "CMakeFiles/tarea.dir/lib/sqlite3.c.o" "gcc" "CMakeFiles/tarea.dir/lib/sqlite3.c.o.d"
   "/run/media/chaos/terciario/proyectos/guagnano/src/main.cpp" "CMakeFiles/tarea.dir/src/main.cpp.o" "gcc" "CMakeFiles/tarea.dir/src/main.cpp.o.d"
   "" "tarea" "gcc" "CMakeFiles/tarea.dir/link.d"
   )

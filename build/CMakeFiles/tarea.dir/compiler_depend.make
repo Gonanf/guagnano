@@ -191,6 +191,7 @@ CMakeFiles/tarea.dir/src/main.cpp.o: /run/media/chaos/terciario/proyectos/guagna
   /usr/include/locale.h \
   /usr/include/pthread.h \
   /usr/include/sched.h \
+  /usr/include/sqlite3.h \
   /usr/include/stdc-predef.h \
   /usr/include/stdio.h \
   /usr/include/stdlib.h \
@@ -223,8 +224,6 @@ tarea: /usr/lib/Scrt1.o \
   CMakeFiles/tarea.dir/src/main.cpp.o
 
 
-CMakeFiles/tarea.dir/src/main.cpp.o:
-
 /usr/lib/libmvec.so.1:
 
 /usr/lib/libm.so.6:
@@ -252,6 +251,10 @@ CMakeFiles/tarea.dir/src/main.cpp.o:
 /usr/include/sys/select.h:
 
 /usr/include/stdio.h:
+
+CMakeFiles/tarea.dir/src/main.cpp.o:
+
+/usr/include/sqlite3.h:
 
 /usr/include/sched.h:
 

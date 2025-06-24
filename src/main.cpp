@@ -1,6 +1,17 @@
 #include <stdio.h>
 #include <iostream>
 #include <limits>
+#include"sqlite3.h"
+
+
+int callback(void* param, int argc, char** argv, char** col){
+	std::cout << "------------------------------" << std::endl;
+	for (int i = 0; i < argc; i++){
+		std::cout << col[i] << " : " << argv[i] << std::endl;
+	}
+	std::cout << "------------------------------" << std::endl;
+	return 0;
+}
 
 bool CIN_FAILSAFE()
 {
@@ -55,63 +66,89 @@ void print_alumno(struct alumno al)
 	return;
 }
 
-int add_alumno(int &cont, struct alumno alumnos[MAX_STUDENTS])
+int add_alumno(sqlite3* db)
 {
-	if (cont >= MAX_STUDENTS)
-	{
-		return -1;
-	}
+	std::string nombre;
+	std::string apellido;
+	int edad;
+	int materias_aprovadas;
+	char estado_civil;
+	char sexo;
+	
 	do
 	{
 		std::cout << "Ingresar nombre" << std::endl;
 
-		std::cin >> alumnos[cont].nombre;
+		std::cin >> nombre;
 	} while (CIN_FAILSAFE());
 	do
 	{
 		std::cout << "Ingresar apellido" << std::endl;
 
-		std::cin >> alumnos[cont].apellido;
+		std::cin >> apellido;
 	} while (CIN_FAILSAFE());
 	do
 	{
 		std::cout << "Ingresar edad" << std::endl;
 
-		std::cin >> alumnos[cont].edad;
+		std::cin >> edad;
 	} while (CIN_FAILSAFE());
 	int des;
 	WAIT_VALID_INPUT("Ingrese estado civil\n-1 para soltero\n-2 para casado\n-3 para viudo", 1, 3, des);
 	switch (des)
 	{
 	case 1:
-		alumnos[cont].estado_civil = 'S';
+		estado_civil = 'S';
 		break;
 	case 2:
-		alumnos[cont].estado_civil = 'C';
+		estado_civil = 'C';
 		break;
 	case 3:
-		alumnos[cont].estado_civil = 'V';
+		estado_civil = 'V';
 		break;
 	default:
 		break;
 	}
 	des = 0;
 	WAIT_VALID_INPUT("Ingrese sexo\n-1 para masculino\n-2 para femenino", 1, 2, des);
-	alumnos[cont].sexo = des == 1 ? 'M' : 'F';
+	sexo = des == 1 ? 'M' : 'F';
 
 	do
 	{
 		std::cout << "Ingresar cantidad materias aprobadas" << std::endl;
 
-		std::cin >> alumnos[cont].materias_aprovadas;
+		std::cin >> materias_aprovadas;
 	} while (CIN_FAILSAFE());
-	cont++;
+	std::string query = "INSERT INTO alumnos(nombre,apellido,edad,materias_aprovadas,estado_civil,sexo) VALUES('"+nombre+"','"+apellido+"',"+std::to_string(edad)+","+std::to_string(materias_aprovadas)+",'"+estado_civil+"','"+sexo+"');";
+	char* errmsg;
+	if (sqlite3_exec(db,query.c_str(),NULL,NULL,&errmsg) != 0){
+		std::cerr << "Error inserting alumnos: " << std::endl <<" "<<errmsg << std::endl;
+		return -1;
+	}
 	return 0;
 }
 
 int main()
 {
 	system("clear");
+	/**
+	 * DB Setup
+	 */
+sqlite3* db;
+
+
+	if (sqlite3_open("amongas.db",&db)){
+		std::cerr << "Error opening the database" << std::endl;
+		return -1;
+	}
+
+	char* errmsg;
+
+	if (sqlite3_exec(db,"CREATE TABLE IF NOT EXISTS alumnos (id INTEGER PRIMARY KEY,nombre TEXT, apellido TEXT, edad INTEGER, materias_aprovadas INTEGER, estado_civil varchar(1),sexo varchar(1));",NULL,NULL,&errmsg) != 0){
+		std::cerr << "Error creating a table alumnos: " << std::endl <<" "<<errmsg << std::endl;
+		return -1;
+	}
+
 	struct alumno alumnos[MAX_STUDENTS];
 	int cont = 0;
 	while (true)
@@ -123,44 +160,27 @@ int main()
 		{
 		case 1:
 		{
-			if (add_alumno(cont, alumnos) == -1)
-			{
-				std::cout << "Error: Max students reached" << std::endl;
-				return -1;
-			}
+			add_alumno(db);
 		}
 		break;
 		case 2:
-			if (cont <= 0)
-			{
-				std::cout << "No hay registros\n";
-				continue;
-			}
-			for (int i = 0; i < cont; i++)
-			{
-				print_alumno(alumnos[i]);
-			}
+			if (sqlite3_exec(db,"SELECT * FROM alumnos;",callback,NULL,&errmsg) != 0){
+					std::cerr << "Error selecting from alumnos: " << std::endl <<" "<<errmsg << std::endl;
+					return -1;
+				}
 			break;
 
 		case 3:
-			if (cont <= 0)
-			{
-				std::cout << "No hay registros\n";
-				continue;
-			}
-			for (int i = 0; i < cont; i++)
-			{
-				std::cout << "----------------\n"
-						  << alumnos[i].nombre << " " << alumnos[i].apellido << "\n----------------\n";
-			}
+			if (sqlite3_exec(db,"SELECT nombre, apellido FROM alumnos;",callback,NULL,&errmsg) != 0){
+					std::cerr << "Error selecting from alumnos: " << std::endl <<" "<<errmsg << std::endl;
+					return -1;
+				}
 			break;
 		case 4:
-			if (cont <= 0)
-			{
-				std::cout << "No hay registros\n";
-				continue;
-			}
-			std::cout << "El promedio es: " << obtener_promedio(alumnos, cont) << std::endl;
+			if (sqlite3_exec(db,"SELECT avg(edad) FROM alumnos;",callback,NULL,&errmsg) != 0){
+					std::cerr << "Error selecting from alumnos: " << std::endl <<" "<<errmsg << std::endl;
+					return -1;
+				}
 			break;
 		case 5:
 			return 0;

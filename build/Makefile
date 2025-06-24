@@ -129,6 +129,30 @@ tarea/fast:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/tarea.dir/build.make CMakeFiles/tarea.dir/build
 .PHONY : tarea/fast
 
+lib/sqlite3.o: lib/sqlite3.c.o
+.PHONY : lib/sqlite3.o
+
+# target to build an object file
+lib/sqlite3.c.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/tarea.dir/build.make CMakeFiles/tarea.dir/lib/sqlite3.c.o
+.PHONY : lib/sqlite3.c.o
+
+lib/sqlite3.i: lib/sqlite3.c.i
+.PHONY : lib/sqlite3.i
+
+# target to preprocess a source file
+lib/sqlite3.c.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/tarea.dir/build.make CMakeFiles/tarea.dir/lib/sqlite3.c.i
+.PHONY : lib/sqlite3.c.i
+
+lib/sqlite3.s: lib/sqlite3.c.s
+.PHONY : lib/sqlite3.s
+
+# target to generate assembly for a file
+lib/sqlite3.c.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/tarea.dir/build.make CMakeFiles/tarea.dir/lib/sqlite3.c.s
+.PHONY : lib/sqlite3.c.s
+
 src/main.o: src/main.cpp.o
 .PHONY : src/main.o
 
@@ -162,6 +186,9 @@ help:
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
 	@echo "... tarea"
+	@echo "... lib/sqlite3.o"
+	@echo "... lib/sqlite3.i"
+	@echo "... lib/sqlite3.s"
 	@echo "... src/main.o"
 	@echo "... src/main.i"
 	@echo "... src/main.s"
