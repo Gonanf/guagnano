@@ -1,0 +1,1 @@
+/data/data/com.termux/files/usr/bin/c++ -O2 -g -DNDEBUG -Xlinker --dependency-file=CMakeFiles/tarea.dir/link.d CMakeFiles/tarea.dir/src/main.cpp.o -o tarea

@@ -1,0 +1,3 @@
+/data/data/com.termux/files/home/guagnano/build/CMakeFiles/tarea.dir
+/data/data/com.termux/files/home/guagnano/build/CMakeFiles/edit_cache.dir
+/data/data/com.termux/files/home/guagnano/build/CMakeFiles/rebuild_cache.dir
