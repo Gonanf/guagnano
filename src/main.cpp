@@ -37,77 +37,6 @@ struct alumno
 	char sexo;
 };
 
-float obtener_promedio(struct alumno al[MAX_STUDENTS], int cant)
-{
-	float sum = 0;
-	for (int i = 0; i < cant; i++)
-	{
-		sum += al[i].edad;
-	}
-	return sum / cant;
-}
-
-void print_alumno(struct alumno al)
-{
-	std::cout << "----------------\n"
-			  << "Nombre: " << al.nombre << "\nApellido: " << al.apellido << "\nEdad: " << al.edad << "\nMaterias aprobadas: " << al.materias_aprovadas << "\nEstado civil: " << al.estado_civil << "\nSexo: " << al.sexo << std::endl
-			  << "------------\n";
-	return;
-}
-
-int add_alumno(int &cont, struct alumno alumnos[MAX_STUDENTS])
-{
-	if (cont >= MAX_STUDENTS)
-	{
-		return -1;
-	}
-	do
-	{
-		std::cout << "Ingresar nombre" << std::endl;
-
-		std::cin >> alumnos[cont].nombre;
-	} while (CIN_FAILSAFE());
-	do
-	{
-		std::cout << "Ingresar apellido" << std::endl;
-
-		std::cin >> alumnos[cont].apellido;
-	} while (CIN_FAILSAFE());
-	do
-	{
-		std::cout << "Ingresar edad" << std::endl;
-
-		std::cin >> alumnos[cont].edad;
-	} while (CIN_FAILSAFE());
-	int des;
-	WAIT_VALID_INPUT("Ingrese estado civil\n-1 para soltero\n-2 para casado\n-3 para viudo", 1, 3, des);
-	switch (des)
-	{
-	case 1:
-		alumnos[cont].estado_civil = 'S';
-		break;
-	case 2:
-		alumnos[cont].estado_civil = 'C';
-		break;
-	case 3:
-		alumnos[cont].estado_civil = 'V';
-		break;
-	default:
-		break;
-	}
-	des = 0;
-	WAIT_VALID_INPUT("Ingrese sexo\n-1 para masculino\n-2 para femenino", 1, 2, des);
-	alumnos[cont].sexo = des == 1 ? 'M' : 'F';
-
-	do
-	{
-		std::cout << "Ingresar cantidad materias aprobadas" << std::endl;
-
-		std::cin >> alumnos[cont].materias_aprovadas;
-	} while (CIN_FAILSAFE());
-	cont++;
-	return 0;
-}
 
 int main()
 {
@@ -123,11 +52,58 @@ int main()
 		{
 		case 1:
 		{
-			if (add_alumno(cont, alumnos) == -1)
+
+			if (cont >= MAX_STUDENTS)
 			{
 				std::cout << "Error: Max students reached" << std::endl;
+
 				return -1;
 			}
+			do
+			{
+				std::cout << "Ingresar nombre" << std::endl;
+
+				std::cin >> alumnos[cont].nombre;
+			} while (CIN_FAILSAFE());
+			do
+			{
+				std::cout << "Ingresar apellido" << std::endl;
+
+				std::cin >> alumnos[cont].apellido;
+			} while (CIN_FAILSAFE());
+			do
+			{
+				std::cout << "Ingresar edad" << std::endl;
+
+				std::cin >> alumnos[cont].edad;
+			} while (CIN_FAILSAFE());
+			int des;
+			WAIT_VALID_INPUT("Ingrese estado civil\n-1 para soltero\n-2 para casado\n-3 para viudo", 1, 3, des);
+			switch (des)
+			{
+			case 1:
+				alumnos[cont].estado_civil = 'S';
+				break;
+			case 2:
+				alumnos[cont].estado_civil = 'C';
+				break;
+			case 3:
+				alumnos[cont].estado_civil = 'V';
+				break;
+			default:
+				break;
+			}
+			des = 0;
+			WAIT_VALID_INPUT("Ingrese sexo\n-1 para masculino\n-2 para femenino", 1, 2, des);
+			alumnos[cont].sexo = des == 1 ? 'M' : 'F';
+
+			do
+			{
+				std::cout << "Ingresar cantidad materias aprobadas" << std::endl;
+
+				std::cin >> alumnos[cont].materias_aprovadas;
+			} while (CIN_FAILSAFE());
+			cont++;
 		}
 		break;
 		case 2:
@@ -138,7 +114,9 @@ int main()
 			}
 			for (int i = 0; i < cont; i++)
 			{
-				print_alumno(alumnos[i]);
+				std::cout << "----------------\n"
+						  << "Nombre: " << alumnos[i].nombre << "\nApellido: " << alumnos[i].apellido << "\nEdad: " << alumnos[i].edad << "\nMaterias aprobadas: " << alumnos[i].materias_aprovadas << "\nEstado civil: " << alumnos[i].estado_civil << "\nSexo: " << alumnos[i].sexo << std::endl
+						  << "------------\n";
 			}
 			break;
 
@@ -155,13 +133,20 @@ int main()
 			}
 			break;
 		case 4:
+		{
 			if (cont <= 0)
 			{
 				std::cout << "No hay registros\n";
 				continue;
 			}
-			std::cout << "El promedio es: " << obtener_promedio(alumnos, cont) << std::endl;
+			float sum = 0;
+			for (int i = 0; i < cont; i++)
+			{
+				sum += alumnos[i].edad;
+			}
+			std::cout << "El promedio es: " << sum / cont << std::endl;
 			break;
+		}
 		case 5:
 			return 0;
 			break;
