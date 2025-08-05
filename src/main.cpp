@@ -2,6 +2,25 @@
 #include <iostream>
 #include"sqlite3.h"
 
+/**@main */
+
+/**
+ * Ejercicio: Hallar el número total de los alumnos presentes adjuntando un listado que contenga:
+ * - Nombre
+ * - Apellido
+ * - Edad
+ * - Estado Civil
+ * - Sexo
+ * - Cantidad de materias aprobadas
+ * Calcular el promedio de edad e intregrar un Menu
+ */
+
+/***************************************
+ * Incorporar Matrices (Actividad anterior)
+ * Incorporar estructuras (Actividad anterior)
+ * Incorporar funciones (Actividad anterior)
+ * Incorporar conexion a bases de datos (Actividad actual)
+ ***************************************/
 
 int callback(void* param, int argc, char** argv, char** col){
 	std::cout << "------------------------------" << std::endl;
@@ -37,65 +56,68 @@ bool CIN_FAILSAFE()
 
 int add_alumno(sqlite3* db)
 {
-	char nombre[MAX_CHARS];
+	struct{
+char nombre[MAX_CHARS];
 	char apellido[MAX_CHARS];
 	int edad;
 	int materias_aprovadas;
 	char estado_civil;
 	char sexo;
+	} alumno;
+	
 	
 	do
 	{
 		std::cout << "Ingresar nombre" << std::endl;
 
-		std::cin >> nombre;
+		std::cin >> alumno.nombre;
 	} while (CIN_FAILSAFE());
 	do
 	{
 		std::cout << "Ingresar apellido" << std::endl;
 
-		std::cin >> apellido;
+		std::cin >> alumno.apellido;
 	} while (CIN_FAILSAFE());
 	do
 	{
 		std::cout << "Ingresar edad" << std::endl;
 
-		std::cin >> edad;
+		std::cin >> alumno.edad;
 	} while (CIN_FAILSAFE());
 	int des;
 	WAIT_VALID_INPUT("Ingrese estado civil\n-1 para soltero\n-2 para casado\n-3 para viudo", 1, 3, des);
 	switch (des)
 	{
 	case 1:
-		estado_civil = 'S';
+		alumno.estado_civil = 'S';
 		break;
 	case 2:
-		estado_civil = 'C';
+		alumno.estado_civil = 'C';
 		break;
 	case 3:
-		estado_civil = 'V';
+		alumno.estado_civil = 'V';
 		break;
 	default:
 		break;
 	}
 	des = 0;
 	WAIT_VALID_INPUT("Ingrese sexo\n-1 para masculino\n-2 para femenino", 1, 2, des);
-	sexo = des == 1 ? 'M' : 'F';
+	alumno.sexo = des == 1 ? 'M' : 'F';
 
 	do
 	{
 		std::cout << "Ingresar cantidad materias aprobadas" << std::endl;
 
-		std::cin >> materias_aprovadas;
+		std::cin >> alumno.materias_aprovadas;
 	} while (CIN_FAILSAFE());
 	sqlite3_stmt* statement;
 	sqlite3_prepare_v2(db,"INSERT INTO alumnos(nombre,apellido,edad,materias_aprovadas,estado_civil,sexo) VALUES(?,?,?,?,?,?);",-1,&statement,NULL);
-	sqlite3_bind_text(statement,1,nombre,25,SQLITE_STATIC);
-	sqlite3_bind_text(statement,2,apellido,25,SQLITE_STATIC);
-	sqlite3_bind_int(statement,3,edad);
-	sqlite3_bind_int(statement,4,materias_aprovadas);
-	sqlite3_bind_text(statement,5,&estado_civil,1,SQLITE_STATIC);
-	sqlite3_bind_text(statement,6,&sexo,1,SQLITE_STATIC);
+	sqlite3_bind_text(statement,1,alumno.nombre,25,SQLITE_STATIC);
+	sqlite3_bind_text(statement,2,alumno.apellido,25,SQLITE_STATIC);
+	sqlite3_bind_int(statement,3,alumno.edad);
+	sqlite3_bind_int(statement,4,alumno.materias_aprovadas);
+	sqlite3_bind_text(statement,5,&alumno.estado_civil,1,SQLITE_STATIC);
+	sqlite3_bind_text(statement,6,&alumno.sexo,1,SQLITE_STATIC);
 
 	if (sqlite3_step(statement) != SQLITE_DONE){
 		std::cerr << "Error inserting alumnos: " << std::endl <<" "<< sqlite3_errmsg(db) << std::endl;
@@ -107,10 +129,7 @@ int add_alumno(sqlite3* db)
 int main()
 {
 	system("clear");
-	/**
-	 * DB Setup
-	 */
-sqlite3* db;
+	sqlite3* db;
 
 
 	if (sqlite3_open("amongas.db",&db)){
