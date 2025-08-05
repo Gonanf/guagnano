@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include <iostream>
-#include <limits>
 #include"sqlite3.h"
 
 
@@ -15,18 +14,17 @@ int callback(void* param, int argc, char** argv, char** col){
 
 bool CIN_FAILSAFE()
 {
-	std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+	std::cin.ignore(256, '\n');
 	if (std::cin.fail())
 	{
 		std::cin.clear();
-		std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+		std::cin.ignore(256, '\n');
 		std::cout << "Mal valor\n";
 		return true;
 	}
 	return false;
 }
 
-/*3 estados civiles*/
 #define WAIT_VALID_INPUT(message, min, max, var) \
 	do                                           \
 	{                                            \
@@ -35,41 +33,12 @@ bool CIN_FAILSAFE()
 		CIN_FAILSAFE();                          \
 	} while (var < min || var > max)
 
-#define MAX_STUDENTS 40
 #define MAX_CHARS 25
-
-struct alumno
-{
-	char nombre[MAX_CHARS];
-	char apellido[MAX_CHARS];
-	int edad;
-	int materias_aprovadas;
-	char estado_civil;
-	char sexo;
-};
-
-float obtener_promedio(struct alumno al[MAX_STUDENTS], int cant)
-{
-	float sum = 0;
-	for (int i = 0; i < cant; i++)
-	{
-		sum += al[i].edad;
-	}
-	return sum / cant;
-}
-
-void print_alumno(struct alumno al)
-{
-	std::cout << "----------------\n"
-			  << "Nombre: " << al.nombre << "\nApellido: " << al.apellido << "\nEdad: " << al.edad << "\nMaterias aprobadas: " << al.materias_aprovadas << "\nEstado civil: " << al.estado_civil << "\nSexo: " << al.sexo << std::endl
-			  << "------------\n";
-	return;
-}
 
 int add_alumno(sqlite3* db)
 {
-	std::string nombre;
-	std::string apellido;
+	char nombre[MAX_CHARS];
+	char apellido[MAX_CHARS];
 	int edad;
 	int materias_aprovadas;
 	char estado_civil;
@@ -119,10 +88,17 @@ int add_alumno(sqlite3* db)
 
 		std::cin >> materias_aprovadas;
 	} while (CIN_FAILSAFE());
-	std::string query = "INSERT INTO alumnos(nombre,apellido,edad,materias_aprovadas,estado_civil,sexo) VALUES('"+nombre+"','"+apellido+"',"+std::to_string(edad)+","+std::to_string(materias_aprovadas)+",'"+estado_civil+"','"+sexo+"');";
-	char* errmsg;
-	if (sqlite3_exec(db,query.c_str(),NULL,NULL,&errmsg) != 0){
-		std::cerr << "Error inserting alumnos: " << std::endl <<" "<<errmsg << std::endl;
+	sqlite3_stmt* statement;
+	sqlite3_prepare_v2(db,"INSERT INTO alumnos(nombre,apellido,edad,materias_aprovadas,estado_civil,sexo) VALUES(?,?,?,?,?,?);",-1,&statement,NULL);
+	sqlite3_bind_text(statement,1,nombre,25,SQLITE_STATIC);
+	sqlite3_bind_text(statement,2,apellido,25,SQLITE_STATIC);
+	sqlite3_bind_int(statement,3,edad);
+	sqlite3_bind_int(statement,4,materias_aprovadas);
+	sqlite3_bind_text(statement,5,&estado_civil,1,SQLITE_STATIC);
+	sqlite3_bind_text(statement,6,&sexo,1,SQLITE_STATIC);
+
+	if (sqlite3_step(statement) != SQLITE_DONE){
+		std::cerr << "Error inserting alumnos: " << std::endl <<" "<< sqlite3_errmsg(db) << std::endl;
 		return -1;
 	}
 	return 0;
@@ -149,7 +125,6 @@ sqlite3* db;
 		return -1;
 	}
 
-	struct alumno alumnos[MAX_STUDENTS];
 	int cont = 0;
 	while (true)
 	{
