@@ -1,3 +1,0 @@
-/run/media/chaos/terciario/proyectos/guagnano/build/CMakeFiles/tarea.dir
-/run/media/chaos/terciario/proyectos/guagnano/build/CMakeFiles/edit_cache.dir
-/run/media/chaos/terciario/proyectos/guagnano/build/CMakeFiles/rebuild_cache.dir
