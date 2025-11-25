@@ -62,7 +62,7 @@ bool CIN_FAILSAFE()
  * @param db La base de datos al cual se le haran las modificaciones
  * @return int Devuelve 0 si no hay problemas, devuelve -1 si hubo un error
  */
-int add_alumno(sqlite3 *db)
+int add_alumno(sqlite3 *db, sqlite3_stmt *statement)
 {
 	struct
 	{
@@ -118,10 +118,6 @@ int add_alumno(sqlite3 *db)
 
 		std::cin >> alumno.materias_aprovadas;
 	} while (CIN_FAILSAFE());
-	sqlite3_stmt *statement;
-	sqlite3_prepare_v2(db, "INSERT INTO alumnos(id_al,nombre,apellido,edad,materias_aprovadas,estado_civil,sexo) SELECT " //! Se utiliza SELECT en vez de VALUES por que SELECT permite hacer consultas dentro de los parametros
-	"(SELECT MAX(id) + 1 FROM (SELECT MAX(id_al) AS id FROM alumnos UNION ALL SELECT MAX(id_reg) as id FROM alumnos_reg))" //! Selecciona la mayor ID posible del mayor ID de alumnos o de la tabla de eliminados
-	",?,?,?,?,?,?;", -1, &statement, NULL);
 	sqlite3_bind_text(statement, 1, alumno.nombre, 25, SQLITE_STATIC);
 	sqlite3_bind_text(statement, 2, alumno.apellido, 25, SQLITE_STATIC);
 	sqlite3_bind_int(statement, 3, alumno.edad);
@@ -216,7 +212,7 @@ int main()
 		return -1;
 	}
 
-	// En esta situacion añadiria una fecha de eliminacion, pero no me quiero adentrar mucho en el tema de los NTP
+	// En esta situacion añadiria una fecha de eliminacion, pero no me quiero adentrar mucho en el tema de los NTP/diferencias de UTC 
 	if (sqlite3_exec(db, "CREATE TABLE IF NOT EXISTS alumnos_reg (id_reg INTEGER PRIMARY KEY,nombre TEXT, apellido TEXT, edad INTEGER, materias_aprovadas INTEGER, estado_civil varchar(1),sexo varchar(1));", NULL, NULL, &errmsg) != 0)
 	{
 		std::cerr << "Error creating a table alumnos_reg: " << std::endl
@@ -234,14 +230,19 @@ int main()
 		\n-Ingresa 4 para obtener el promedio de edad\
 		\n-Ingresa 5 para eliminar un alumno\
 		\n-Ingresa 6 para ver el listado de alumnos eliminados\
-		\n-Ingresa 7 para salir\
+		\n-Ingresa 7 editar un alumno\
+		\n-Ingresa 8 para salir\
 		\n----------", 1, 7, menu);
 		system("clear");
 		switch (menu)
 		{
 		case 1:
 		{
-			add_alumno(db);
+				sqlite3_stmt *statement;
+			sqlite3_prepare_v2(db, "INSERT INTO alumnos(id_al,nombre,apellido,edad,materias_aprovadas,estado_civil,sexo) SELECT " //! Se utiliza SELECT en vez de VALUES por que SELECT permite hacer consultas dentro de los parametros
+	"(SELECT MAX(id) + 1 FROM (SELECT MAX(id_al) AS id FROM alumnos UNION ALL SELECT MAX(id_reg) as id FROM alumnos_reg))" //! Selecciona la mayor ID posible del mayor ID de alumnos o de la tabla de eliminados
+	",?,?,?,?,?,?;", -1, &statement, NULL);
+			add_alumno(db, statement);
 		}
 		break;
 		case 2:
@@ -281,6 +282,27 @@ int main()
 			}
 			break;
 		case 7:
+		{
+			int id;
+	char *errmsg;
+	if (sqlite3_exec(db, "SELECT * FROM alumnos;", callback, NULL, &errmsg) != 0)
+	{
+		std::cerr << "Error selecting from alumnos: " << std::endl
+				  << " " << errmsg << std::endl;
+		return -1;
+	}
+	do
+	{
+		std::cout << "Ingresar la ID del alumno a eliminar: ";
+		std::cin >> id;
+	} while (CIN_FAILSAFE());
+		sqlite3_stmt *statement;
+			sqlite3_prepare_v2(db, "UPDATE alumnos SET nombre = ?, apellido = ?, edad = ?, materias_aprovadas = ?, estado_civil = ?, sexo = ? WHERE id_al = ?", -1, &statement, NULL);
+			sqlite3_bind_int(statement, 7, id);
+			add_alumno(db, statement);
+			break;
+		}
+		case 8:
 			return 0;
 			break;
 		}
